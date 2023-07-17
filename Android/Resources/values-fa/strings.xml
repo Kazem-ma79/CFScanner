@@ -1,0 +1,33 @@
+<resources>
+  <string name="app_name">CFScanner</string>
+  <string name="app_description">
+    ابزار CFScanner، جهت بررسی فیلتر دامنه های پشت کلودفلر!
+    این برنامه بررسی میکند که یک دامنه فیلتر شده یا خیر و IP های تمیز CDN کلودفلر را اسکن میکند برای زنده کردن دوباره SNI.
+    اتصال به دامنه هایتان را با استفاده از IP تمیز کلودفلر حفظ کنید. یک لیست جامع از IP های تمیز کلودفلر مرتبط با دامنه خود را به سرعت پیدا کنید.
+    با استفاده از CFScanner محدودیت های فیلترینگ را دور زده و به اینترنت آزاد دسترسی داشته باشید.
+    
+    با تشکر از IRCF و تمام تیم هایی که در جمع آوری IP های کلودفلر تلاش میکنند.
+    
+    #اینترنت_برای_همه_یا_هیچکس
+  </string>
+  <string name="action_settings">تنظیمات</string>
+  <string name="navmenu_scanner">اسکنر</string>
+  <string name="navmenu_checker">چکر</string>
+  <string name="navmenu_about">درباره</string>
+  <string name="input_hostname">دامنه</string>
+  <string name="input_port">پورت</string>
+  <string name="input_thread">ترد</string>
+  <string name="input_cf_ip">IP کلودفلر</string>
+  <string name="input_ssl">SSL</string>
+  <string name="label_good_ip">IP های تمیز</string>
+  <string name="label_result">نتیجه</string>
+  <string name="button_scan">اسکن</string>
+  <string name="button_check">بررسی</string>
+  <string name="link_github">گیت هاب</string>
+  <string name="link_ircf">IRCF</string>
+  <string name="error_no_internet">اینترنت متصل نیست!</string>
+  <string name="error_incomplete_input">تمام فیلدها را پر کنید!</string>
+  <string name="state_good">خوب</string>
+  <string name="state_bad">فیلتر شده</string>
+  <string name="cancel">کنسل</string>
+</resources>

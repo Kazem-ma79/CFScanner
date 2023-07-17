@@ -1,0 +1,33 @@
+<resources>
+  <string name="app_name">CFScanner</string>
+  <string name="app_description">
+    Introducing CFScanner, ultimate domain filter checking companion!
+    This app effortlessly checks if a domain is filtered and finds clean Cloudflare CDN IPs to recover domain using SNI.
+    Keep access to your domain with a clean Cloudflare IP. Get instant results and discover a comprehensive list of clean IPs associated with the domain.
+    Break free from restrictions and unlock the web with CFScanner.
+
+    Thanks to IRCF.space and all other teams for providing Cloudflare IP ranges.
+
+    #اینترنت_برای_همه_یا_هیچکس
+  </string>
+  <string name="action_settings">Settings</string>
+  <string name="navmenu_scanner">Scanner</string>
+  <string name="navmenu_checker">Domain Checker</string>
+  <string name="navmenu_about">About</string>
+  <string name="input_hostname">Hostname</string>
+  <string name="input_port">Port</string>
+  <string name="input_thread">Threads</string>
+  <string name="input_cf_ip">Cloudflare IP</string>
+  <string name="input_ssl">SSL</string>
+  <string name="label_good_ip">Good IPs</string>
+  <string name="label_result">Result</string>
+  <string name="button_scan">Scan</string>
+  <string name="button_check">Check</string>
+  <string name="link_github">Github</string>
+  <string name="link_ircf">IRCF</string>
+  <string name="error_no_internet">Internet connection required!</string>
+  <string name="error_incomplete_input">Complete required fields!</string>
+  <string name="state_good">Good</string>
+  <string name="state_bad">Filtered</string>
+  <string name="cancel">Cancel</string>
+</resources>

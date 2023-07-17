@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="Windows.IPAddressTextBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:local="clr-namespace:Windows"
+             mc:Ignorable="d" Height="20" Width="125"
+             x:Name="control"
+             Background="#252525"
+             BorderThickness="1"
+             BorderBrush="#CCC">
+    <Grid x:Name="wrapGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" Name="column"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" Name="row"/>
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="firstBox"
+                 Grid.Column="0"
+                 BorderThickness="0" 
+                 Background="{x:Null}"  
+                 MaxLength="3" 
+                 Text="" 
+                 TextAlignment="Center" 
+                 VerticalAlignment="Center"                     
+                 PreviewKeyDown="firstByte_PreviewKeyDown"
+                 PreviewTextInput="firstByte_PreviewTextInput"
+                 TextChanged="firstByte_TextChanged" />
+        <TextBlock x:Name="textBlock"  
+                   Grid.Column="1"
+                   Text="." 
+                   VerticalAlignment="Center" 
+                   TextAlignment="Center"
+                   Foreground="#DDD"/>
+
+        <TextBox x:Name="secondBox" 
+                 Grid.Column="2"
+                 BorderThickness="0" 
+                 Background="{x:Null}"  
+                 MaxLength="3" 
+                 Text="" 
+                 TextAlignment="Center"
+                 VerticalAlignment="Center"                         
+                 PreviewKeyDown="secondByte_PreviewKeyDown" 
+                 PreviewTextInput="secondByte_PreviewTextInput"
+                 TextChanged="secondByte_TextChanged" />
+        <TextBlock x:Name="textBlock_Copy" 
+                   Grid.Column="3"
+                   Text="." 
+                   VerticalAlignment="Center"  
+                   TextAlignment="Center"
+                   Foreground="#DDD"/>
+
+        <TextBox x:Name="thirdBox"  
+                 Grid.Column="4"
+                 BorderThickness="0" 
+                 Background="{x:Null}" 
+                 MaxLength="3" 
+                 Text=""
+                 TextAlignment="Center"
+                 VerticalAlignment="Center"                      
+                 PreviewKeyDown="thirdByte_PreviewKeyDown"
+                 PreviewTextInput="thirdByte_PreviewTextInput"
+                 TextChanged="thirdByte_TextChanged"/>
+        <TextBlock x:Name="textBlock_Copy1" 
+                   Grid.Column="5"
+                   Text="." 
+                   VerticalAlignment="Center"  
+                   TextAlignment="Center"
+                   Foreground="#DDD"/>
+
+        <TextBox x:Name="fourthBox"  
+                 Grid.Column="6"
+                 BorderThickness="0"
+                 Background="{x:Null}" 
+                 MaxLength="3"
+                 Text=""
+                 TextAlignment="Center"
+                 VerticalAlignment="Center"                     
+                 PreviewKeyDown="fourthByte_PreviewKeyDown"
+                 PreviewTextInput="fourthByte_PreviewTextInput"
+                 TextChanged="fourthByte_TextChanged" />
+    </Grid>
+</UserControl>
