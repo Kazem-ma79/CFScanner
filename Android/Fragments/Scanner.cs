@@ -37,7 +37,7 @@ namespace CFScanner.Fragments
         private ListView goodIpListView;
         private List<string> goodIps, scannedIps;
         private ArrayAdapter<string> goodIpAdapter;
-        private string errorInternet, errorInputNull, scanLabel, cancelLabel;
+        private string errorInternet, errorInputNull, scanLabel, cancelLabel, clipboardMessage;
 
         private CancellationTokenSource cancellationTokenSource;
         public override void OnCreate(Bundle savedInstanceState)
@@ -62,6 +62,7 @@ namespace CFScanner.Fragments
             errorInputNull = Activity.GetStringFromResources(Resource.String.error_incomplete_input);
             scanLabel = Activity.GetStringFromResources(Resource.String.button_scan);
             cancelLabel = Activity.GetStringFromResources(Resource.String.cancel);
+            clipboardMessage = Activity.GetStringFromResources(Resource.String.clipboard_set);
 
             goodIps = new List<string>();
             scannedIps = new List<string>();
@@ -78,11 +79,13 @@ namespace CFScanner.Fragments
 
         private void GoodIpListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            Activity.RunOnUiThread(() =>
+            Activity.RunOnUiThread(async () =>
             {
                 var pos = e.Position;
                 var item = goodIpListView.GetItemAtPosition(pos).ToString();
-                Toast.MakeText(Activity, item, ToastLength.Short).Show();
+                string selectedIP = item.Split(':')[0];
+                await Clipboard.SetTextAsync(selectedIP);
+                Toast.MakeText(Activity, $"{selectedIP} {clipboardMessage}", ToastLength.Short).Show();
             });
         }
 

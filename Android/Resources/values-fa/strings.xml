@@ -30,4 +30,5 @@
   <string name="state_good">خوب</string>
   <string name="state_bad">فیلتر شده</string>
   <string name="cancel">کنسل</string>
+  <string name="clipboard_set">در حافظه کپی شد</string>
 </resources>

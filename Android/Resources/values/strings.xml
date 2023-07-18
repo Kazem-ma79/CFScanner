@@ -30,4 +30,5 @@
   <string name="state_good">Good</string>
   <string name="state_bad">Filtered</string>
   <string name="cancel">Cancel</string>
+  <string name="clipboard_set">copied in clipboard</string>
 </resources>
