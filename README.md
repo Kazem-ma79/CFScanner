@@ -1,6 +1,8 @@
+<div style="text-align: center;">
+
 [![Logo](/images/logo.png)](https://github.com/kazem-ma79/CFScanner)
 
-## CFScanner
+<h1 style="text-align: center;">CF Domain Scanner</h1>
 
 An awesome domain-based Cloudflare CDN IP scanner and domain filter checker! 
 
@@ -9,6 +11,8 @@ An awesome domain-based Cloudflare CDN IP scanner and domain filter checker! 
 [Report Bug](https://github.com/kazem-ma79/CFScanner/issues) . [Request Feature](https://github.com/kazem-ma79/CFScanner/issues)
 
 ![Downloads](https://img.shields.io/github/downloads/kazem-ma79/CFScanner/total) ![Forks](https://img.shields.io/github/forks/kazem-ma79/CFScanner?style=social) ![Stargazers](https://img.shields.io/github/stars/kazem-ma79/CFScanner?style=social) ![Issues](https://img.shields.io/github/issues/kazem-ma79/CFScanner) ![License](https://img.shields.io/github/license/kazem-ma79/CFScanner)
+
+</div>
 
 ## Table Of Contents
 
@@ -24,7 +28,8 @@ An awesome domain-based Cloudflare CDN IP scanner and domain filter checker! 
 
 ## About The Project
 
-<img src="/images/screenshot.png" width="200px"/>
+<img src="/images/sc-android.png" width="200px"/>
+<img src="/images/sc-windows.png" width="280px"/>
 
 Using this tool you can scan Cloudflare CDN IP addresses that work with your own domain. Also it's possible to check if your domain is filtered.
 

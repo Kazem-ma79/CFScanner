@@ -7,7 +7,7 @@
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="CFScanner" Height="600" MinHeight="600" MaxHeight="600" Width="350" MinWidth="350" MaxWidth="350">
+        Title="CF Domain Scanner" Height="600" MinHeight="600" MaxHeight="600" Width="400" MinWidth="400" MaxWidth="400">
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
@@ -21,18 +21,18 @@
 
     <Grid Background="Black">
         <Label x:Name="HostnameLabel" Margin="10,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Hostname"/>
-        <TextBox x:Name="Hostname" Margin="100,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="NoWrap" Width="200"/>
+        <TextBox x:Name="Hostname" Margin="100,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="NoWrap" Width="280"/>
         <Label x:Name="PortLabel" Margin="10,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Port"/>
-        <mah:NumericUpDown x:Name="Port" Margin="100,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" Minimum="1" Maximum="65535" Value="443" Width="200"/>
+        <mah:NumericUpDown x:Name="Port" Margin="100,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" Minimum="1" Maximum="65535" Value="443" Width="280"/>
         <Label x:Name="ThreadLabel" Margin="10,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Thread"/>
-        <mah:NumericUpDown x:Name="Thread" Margin="100,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" Value="10" Width="200"/>
+        <mah:NumericUpDown x:Name="Thread" Margin="100,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" Value="10" Width="280"/>
         <Label x:Name="IPLabel" Margin="10,140,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Cloudflare IP"/>
-        <local:IPAddressTextBox x:Name="CloudflareIP" Margin="100,140,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200"/>
-        <mah:ToggleSwitch x:Name="SSL" Margin="50,180,0,0" VerticalAlignment="Top" Header="SSL" Width="100"/>
-        <mah:ToggleSwitch x:Name="Mode" Margin="200,180,0,0" VerticalAlignment="Top" Header="App Mode" OnContent="Scanner" OffContent="Checker" Width="100"/>
+        <local:IPAddressTextBox x:Name="CloudflareIP" Margin="100,140,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="280"/>
+        <mah:ToggleSwitch x:Name="SSL" Margin="75,180,0,0" VerticalAlignment="Top" Header="SSL" Width="100"/>
+        <mah:ToggleSwitch x:Name="Mode" Margin="225,180,0,0" VerticalAlignment="Top" Header="App Mode" OnContent="Scanner" OffContent="Checker" Width="100"/>
         <ListBox x:Name="Result" Margin="10,250,10,85"/>
-        <Button x:Name="StartBtn" Margin="10,0,180,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Scan/Check" Click="StartBtn_Click"/>
-        <Button x:Name="CancelBtn" Margin="180,0,10,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Cancel" Click="CancelBtn_Click"/>
+        <Button x:Name="StartBtn" Margin="10,0,210,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Scan/Check" Click="StartBtn_Click"/>
+        <Button x:Name="CancelBtn" Margin="210,0,10,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Cancel" Click="CancelBtn_Click"/>
         <mah:MetroProgressBar x:Name="ScanProgress" Margin="10,0,10,50" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="20"/>
         <Label x:Name="ProgressLabel" Margin="10,490,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Content=""/>
     </Grid>

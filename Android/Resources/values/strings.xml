@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">CFScanner</string>
+  <string name="app_name">CF Domain Scanner</string>
   <string name="app_description">
     Introducing CFScanner, ultimate domain filter checking companion!
     This app effortlessly checks if a domain is filtered and finds clean Cloudflare CDN IPs to recover domain using SNI.

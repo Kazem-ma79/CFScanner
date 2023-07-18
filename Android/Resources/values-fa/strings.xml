@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">CFScanner</string>
+  <string name="app_name">CF Domain Scanner</string>
   <string name="app_description">
     ابزار CFScanner، جهت بررسی فیلتر دامنه های پشت کلودفلر!
     این برنامه بررسی میکند که یک دامنه فیلتر شده یا خیر و IP های تمیز CDN کلودفلر را اسکن میکند برای زنده کردن دوباره SNI.
