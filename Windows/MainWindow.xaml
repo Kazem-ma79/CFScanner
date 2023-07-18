@@ -31,7 +31,7 @@
         <mah:ToggleSwitch x:Name="SSL" Margin="50,180,0,0" VerticalAlignment="Top" Header="SSL" Width="100"/>
         <mah:ToggleSwitch x:Name="Mode" Margin="200,180,0,0" VerticalAlignment="Top" Header="App Mode" OnContent="Scanner" OffContent="Checker" Width="100"/>
         <ListBox x:Name="Result" Margin="10,250,10,85"/>
-        <Button x:Name="StartBtn" Margin="10,0,180,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Scan" Click="StartBtn_Click"/>
+        <Button x:Name="StartBtn" Margin="10,0,180,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Scan/Check" Click="StartBtn_Click"/>
         <Button x:Name="CancelBtn" Margin="180,0,10,10" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Content="Cancel" Click="CancelBtn_Click"/>
         <mah:MetroProgressBar x:Name="ScanProgress" Margin="10,0,10,50" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="20"/>
         <Label x:Name="ProgressLabel" Margin="10,490,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Content=""/>

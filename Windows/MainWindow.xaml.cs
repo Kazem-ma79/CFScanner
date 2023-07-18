@@ -116,6 +116,7 @@ namespace Windows
                 cfIP = CloudflareIP.Text;
             int port = Convert.ToInt32(Port.Value),
                 thread = Convert.ToInt32(Thread.Value);
+
             if (Mode.IsOn) // Scanner Mode
             {
                 Worker.RunWorkerAsync(argument: (cdnIps, proto, hostname, port, thread));
@@ -125,10 +126,15 @@ namespace Windows
             else // Checker Mode
             {
                 var result = await CheckIp(proto, $"{cfIP}:{port}", hostname);
-                if (result)
-                    MessageBox.Show("Good");
-                else
-                    MessageBox.Show("Filtered");
+                var mySettings = new MetroDialogSettings()
+                {
+                    AnimateShow = true,
+                    AnimateHide = true
+                };
+                string errorMessage = result ? "IP is good" : "IP is filtered";
+                await this.ShowMessageAsync("Checking Done!",
+                    errorMessage,
+                    MessageDialogStyle.Affirmative, mySettings);
             }
         }
 
