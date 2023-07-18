@@ -50,7 +50,7 @@ Platforms:
 
 ## Download
 
-Get the latest version from github release page.
+Get the latest version from [github](https://github.com/Kazem-ma79/CFScanner/releases/latest).
 
 ## Usage
 
