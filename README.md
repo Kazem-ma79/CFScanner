@@ -24,7 +24,7 @@ An awesome domain-based Cloudflare CDN IP scanner and domain filter checker! 
 
 ## About The Project
 
-![Screen Shot](images/screenshot.png){ width: 200px; }
+<img src="/images/screenshot.png" width="200px"/>
 
 Using this tool you can scan Cloudflare CDN IP addresses that work with your own domain. Also it's possible to check if your domain is filtered.
 
