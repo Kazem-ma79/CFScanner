@@ -44,7 +44,22 @@ namespace Windows
             };
             Results = new();
             Result.ItemsSource = Results;
+            Result.SelectionChanged += Result_SelectionChanged;
             Worker.DoWork += Worker_Job;
+        }
+
+        private async void Result_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var item = Result.SelectedItem.ToString();
+            Clipboard.SetText(item);
+            var mySettings = new MetroDialogSettings()
+            {
+                AnimateShow = true,
+                AnimateHide = true
+            };
+            await this.ShowMessageAsync("Copied!",
+                $@"{item} copied to clipboard.",
+                MessageDialogStyle.Affirmative, mySettings);
         }
 
         private async void Worker_Job(object? sender, DoWorkEventArgs e)
