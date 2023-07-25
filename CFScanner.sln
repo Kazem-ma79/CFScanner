@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFScanner", "Android\CFScan
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Linux", "Linux\Linux.pyproj", "{511F1F49-3542-44DF-A8FB-4DBAB37A97A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows", "Windows\Windows.csproj", "{E25A4AB5-843A-4512-8CB0-4C5F26E728CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windows", "Windows\Windows.csproj", "{E25A4AB5-843A-4512-8CB0-4C5F26E728CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{D42CA9BB-B0D2-4481-B01C-A4B061B31CC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{E25A4AB5-843A-4512-8CB0-4C5F26E728CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E25A4AB5-843A-4512-8CB0-4C5F26E728CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E25A4AB5-843A-4512-8CB0-4C5F26E728CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D42CA9BB-B0D2-4481-B01C-A4B061B31CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D42CA9BB-B0D2-4481-B01C-A4B061B31CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D42CA9BB-B0D2-4481-B01C-A4B061B31CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D42CA9BB-B0D2-4481-B01C-A4B061B31CC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
