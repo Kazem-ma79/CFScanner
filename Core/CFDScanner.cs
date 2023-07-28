@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Core
 {
@@ -21,21 +24,32 @@ namespace Core
     {
         public static async Task<ScanResult> Scan(string hostname, int port, string ip, string path = "/", int timeout = 5)
         {
-            string proto = port switch
+            string proto;
+            switch (port)
             {
-                443 or 2053 or 2083 or 2087 or 2096 or 8443 => "https",
-                _ => "http",
-            };
+                case 443:
+                case 2053:
+                case 2083:
+                case 2087:
+                case 2096:
+                case 8443:
+                    proto = "https";
+                    break;
+                default:
+                    proto = "http";
+                    break;
+            }
+
             string url = port == 80 ? $"{proto}://{ip}" : port == 443 ? $"{proto}://{ip}" : $"{proto}://{ip}:{port}";
             url += path;
             long delay = -1;
 
-            HttpClientHandler httpClientHandler = new()
+            HttpClientHandler httpClientHandler = new HttpClientHandler()
             {
                 AllowAutoRedirect = false
             };
 
-            using HttpClient client = new(httpClientHandler)
+            using HttpClient client = new HttpClient(httpClientHandler)
             {
                 BaseAddress = new Uri(url),
                 Timeout = TimeSpan.FromSeconds(timeout)
@@ -52,7 +66,7 @@ namespace Core
                 bool isNormal = statusCode == HttpStatusCode.OK;
                 bool isV2ray = statusCode == HttpStatusCode.BadRequest && !resultContent.ToLower().Contains("plain http request was sent to https port");
                 bool isFiltered = (statusCode == HttpStatusCode.MovedPermanently || statusCode == HttpStatusCode.Found) && result.Headers.Location.Host.Contains("10.10.34.3");
-                return new()
+                return new ScanResult()
                 {
                     Delay = delay,
                     Status = isV2ray || isNormal ? ScanResult.ScanStatus.Success : isFiltered ? ScanResult.ScanStatus.Filtered : ScanResult.ScanStatus.Error
@@ -61,12 +75,12 @@ namespace Core
             catch (Exception ex)
             {
                 if (ex is TimeoutException || ex is TaskCanceledException)
-                    return new()
+                    return new ScanResult()
                     {
                         Delay = delay,
                         Status = ScanResult.ScanStatus.Timeout
                     };
-                return new()
+                return new ScanResult()
                 {
                     Delay = delay,
                     Status = ScanResult.ScanStatus.Error
