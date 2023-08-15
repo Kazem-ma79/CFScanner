@@ -37,6 +37,7 @@ Using this tool you can scan Cloudflare CDN IP addresses that work with your own
 *   You can find which IP works on your domain name
 *   No need to scan all IP ranges, CDN IP addresses are included
 *   Project available on multiple platforms (Windows, Linux, Android, ...)
+*   Ping speed of IPs to find the fastest one
 
 ## Built With
 
