@@ -28,13 +28,34 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/portLayout"
+        android:id="@+id/pathLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:errorTextColor="@color/colorPrimaryLight"
         app:errorIconTint="@color/colorDanger"
         app:layout_constraintTop_toBottomOf="@id/hostnameLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pathInput"
+            android:hint="@string/input_path"
+            android:text="/"
+            android:singleLine="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/portLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:errorTextColor="@color/colorPrimaryLight"
+        app:errorIconTint="@color/colorDanger"
+        app:layout_constraintTop_toBottomOf="@id/pathLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -69,23 +90,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <RelativeLayout
-        android:id="@+id/sslLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/threadCountLayout"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/sslInput"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:layout_marginLeft="15dp"
-            android:text="@string/input_ssl" />
-
-    </RelativeLayout>
-
     <TextView
         android:id="@+id/goodIpLabel"
         android:layout_width="match_parent"
@@ -94,7 +98,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/sslLayout"
+        app:layout_constraintTop_toBottomOf="@id/threadCountLayout"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ListView

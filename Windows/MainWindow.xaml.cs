@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using Core;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -30,159 +31,189 @@ namespace Windows
     public partial class MainWindow : MetroWindow
     {
         private CancellationTokenSource cancellationTokenSource;
-        private ObservableCollection<string> Results;
-        private BackgroundWorker Worker;
+        private readonly ObservableCollection<int> CFPorts = new(new int[] { 80, 443, 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8080, 8880, 8443 });
+        private ObservableCollection<ResultItem> Results;
+        private CollectionViewSource ResultCollection;
+
+        List<Thread> threads;
+        List<string> cdnIps;
+        string hostname, cfIP, path;
+        int port, thread, IPiterator = 0;
 
         public MainWindow()
         {
             InitializeComponent();
             CloudflareIP.Height = Port.Height;
-            cancellationTokenSource = new CancellationTokenSource();
-            Worker = new BackgroundWorker()
-            {
-                WorkerSupportsCancellation = true
-            };
+
+            hostname = cfIP = string.Empty;
+            path = "/";
+
+            cancellationTokenSource = new();
+            threads = new();
             Results = new();
-            Result.ItemsSource = Results;
+            ResultCollection = new()
+            {
+                Source = Results
+            };
+            ResultCollection.SortDescriptions.Add(new SortDescription("Ping", ListSortDirection.Ascending));
+            Result.ItemsSource = ResultCollection.View;
             Result.SelectionChanged += Result_SelectionChanged;
-            Worker.DoWork += Worker_Job;
+
+            cdnIps = new(Properties.Resources.cdn.Split(Environment.NewLine));
+        }
+
+        private void AppMode_Changed(object sender, RoutedEventArgs e)
+        {
+            CloudflareIP.IsEnabled = !Mode.IsOn;
+            Thread.IsEnabled = Mode.IsOn;
         }
 
         private async void Result_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var item = Result.SelectedItem.ToString();
-            Clipboard.SetText(item);
-            var mySettings = new MetroDialogSettings()
+            if (Result.SelectedIndex >= 0)
             {
-                AnimateShow = true,
-                AnimateHide = true
-            };
-            await this.ShowMessageAsync("Copied!",
-                $@"{item} copied to clipboard.",
-                MessageDialogStyle.Affirmative, mySettings);
-        }
-
-        private async void Worker_Job(object? sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                var args = (ValueTuple<string[], string, string, int, int>)e.Argument;
-                string[] cdnIps = args.Item1;
-                string proto = args.Item2,
-                    hostname = args.Item3;
-                int port = args.Item4,
-                    thread = args.Item5,
-                    progress = 0;
-
-                Dispatcher.Invoke(() =>
-                {
-                    ScanProgress.Value = 0;
-                    ScanProgress.Maximum = cdnIps.Length;
-                });
-
-                var options = new ParallelOptions()
-                {
-                    MaxDegreeOfParallelism = thread,
-                    CancellationToken = cancellationTokenSource.Token
-                };
-
-                await Parallel.ForEachAsync(cdnIps, options, async (ip, ct) =>
-                {
-                    if (ct.IsCancellationRequested)
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            StartBtn.IsEnabled = true;
-                            CancelBtn.IsEnabled = false;
-                        });
-                        return;
-                    }
-                    var result = await CheckIp(proto, $"{ip}:{port}", hostname);
-                    if (result)
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            Results.Add(ip);
-                        });
-                    }
-                    Dispatcher.Invoke(() =>
-                    {
-                        ScanProgress.Value = ++progress;
-                        ProgressLabel.Content = $"{progress} of {cdnIps.Length}";
-                    });
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            Dispatcher.Invoke(() =>
-            {
-                StartBtn.IsEnabled = true;
-                CancelBtn.IsEnabled = false;
-            });
-        }
-
-        private async void StartBtn_Click(object sender, RoutedEventArgs e)
-        {
-            string[] cdnIps = Properties.Resources.cdn.Split(Environment.NewLine);
-            string proto = SSL.IsOn ? "https" : "http",
-                hostname = Hostname.Text,
-                cfIP = CloudflareIP.Text;
-            int port = Convert.ToInt32(Port.Value),
-                thread = Convert.ToInt32(Thread.Value);
-
-            if (Mode.IsOn) // Scanner Mode
-            {
-                Worker.RunWorkerAsync(argument: (cdnIps, proto, hostname, port, thread));
-                StartBtn.IsEnabled = false;
-                CancelBtn.IsEnabled = true;
-            }
-            else // Checker Mode
-            {
-                var result = await CheckIp(proto, $"{cfIP}:{port}", hostname);
+                string item = ((ResultItem)Result.SelectedItem).Ping.ToString();
+                Clipboard.SetText(item);
                 var mySettings = new MetroDialogSettings()
                 {
                     AnimateShow = true,
                     AnimateHide = true
                 };
-                string errorMessage = result ? "IP is good" : "IP is filtered";
-                await this.ShowMessageAsync("Checking Done!",
-                    errorMessage,
+                await this.ShowMessageAsync("Copied!",
+                    $@"{item} copied to clipboard.",
                     MessageDialogStyle.Affirmative, mySettings);
             }
         }
 
-        private async Task<bool> CheckIp(string proto, string ip, string hostname)
+        private async void Scan()
         {
-            string url = $"{proto}://{ip}/";
-
-            HttpClientHandler httpClientHandler = new()
+            while (IPiterator < cdnIps.Count)
             {
-                AllowAutoRedirect = false
-            };
-
-            using HttpClient client = new(httpClientHandler)
-            {
-                BaseAddress = new Uri(url)
-            };
-            client.DefaultRequestHeaders.Host = hostname;
-
-            try
-            {
-                var result = await client.GetAsync(url);
-                var statusCode = result.StatusCode;
-                string resultContent = await result.Content.ReadAsStringAsync();
-                return (statusCode == HttpStatusCode.BadRequest && !resultContent.ToLower().Contains("plain http request was sent to https port"));
+                if (cancellationTokenSource.IsCancellationRequested)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        StartBtn.IsEnabled = true;
+                        CancelBtn.IsEnabled = false;
+                    });
+                    foreach (var item in threads)
+                    {
+                        item.Interrupt();
+                        item.Join(500);
+                    }
+                    break;
+                }
+                var ip = cdnIps[IPiterator];
+                IPiterator++;
+                var result = await CFDScanner.Scan(hostname, port, ip, path, 3);
+                if (result.Status == ScanResult.ScanStatus.Success)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        Results.Add(new() { IP = ip, Ping = result.Delay });
+                    });
+                }
+                Dispatcher.Invoke(() =>
+                {
+                    ScanProgress.Value = IPiterator;
+                    ProgressLabel.Content = $"{IPiterator} of {cdnIps.Count}";
+                });
             }
-            catch (Exception ex)
+            if (IPiterator == cdnIps.Count)
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (!Mode.IsOn)
-                        MessageBox.Show(ex.Message);
+                    StartBtn.IsEnabled = true;
+                    CancelBtn.IsEnabled = false;
                 });
-                return false;
+                cancellationTokenSource = new();
+            }
+        }
+
+        private async void StartBtn_Click(object sender, RoutedEventArgs e)
+        {
+            #region Reset Values
+            cancellationTokenSource = new();
+            hostname = Hostname.Text;
+            cfIP = CloudflareIP.Text;
+            path = Path.Text;
+            port = Convert.ToInt32(Port.Value);
+            thread = Convert.ToInt32(Thread.Value);
+            IPiterator = 0;
+            ProgressLabel.Content = "";
+            #endregion
+
+            #region Input Validation
+            bool hasError = false;
+            string errorMsg = string.Empty;
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                hasError = true;
+                errorMsg += $"Hostname{Environment.NewLine}";
+            }
+            if (port < 1 || port > 65534)
+            {
+                hasError = true;
+                errorMsg += $"Port{Environment.NewLine}";
+            }
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                hasError = true;
+                errorMsg += $"Path{Environment.NewLine}";
+            }
+            if (string.IsNullOrWhiteSpace(cfIP) && !Mode.IsOn)
+            {
+                hasError = true;
+                errorMsg += $"Cloudflare IP{Environment.NewLine}";
+            }
+            if ((thread < 1 || thread > 1000000) && Mode.IsOn)
+            {
+                hasError = true;
+                errorMsg += $"Thread Count{Environment.NewLine}";
+            }
+            if (hasError)
+            {
+                string errorMessage = $"Invalid fields: {Environment.NewLine}{errorMsg}";
+                await this.ShowMessageAsync("Input error",
+                    errorMessage,
+                    MessageDialogStyle.Affirmative);
+            }
+            #endregion
+
+            if (Mode.IsOn)
+            {
+                #region Scan Mode
+                StartBtn.IsEnabled = false;
+                CancelBtn.IsEnabled = true;
+                ScanProgress.Maximum = cdnIps.Count;
+                Results.Clear();
+
+                threads.Clear();
+                for (int j = 0; j < thread; j++)
+                {
+                    threads.Add(new(Scan)
+                    {
+                        IsBackground = true,
+                        Name = $"scanner #{j}"
+                    });
+                    threads[j].Start();
+                }
+                #endregion
+            }
+            else
+            {
+                #region Check Mode
+                var result = await CFDScanner.Scan(hostname, port, cfIP, path);
+                var mySettings = new MetroDialogSettings()
+                {
+                    AnimateShow = true,
+                    AnimateHide = true
+                };
+                string errorMessage = $"Scan status: {result.Status}{Environment.NewLine}Delay: {result.Delay}";
+                await this.ShowMessageAsync("Checking Done!",
+                    errorMessage,
+                    MessageDialogStyle.Affirmative, mySettings);
+                #endregion
             }
         }
 

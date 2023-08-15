@@ -22,15 +22,16 @@ using Xamarin.Essentials;
 using Google.Android.Material.SwitchMaterial;
 using Google.Android.Material.MaterialSwitch;
 using AndroidX.AppCompat.Widget;
+using Core;
 
 namespace CFScanner.Fragments
 {
     public class Scanner : Fragment
     {
         private TextInputEditText hostnameInput;
+        private TextInputEditText pathInput;
         private TextInputEditText portInput;
         private TextInputEditText threadCountInput;
-        private SwitchCompat sslInput;
         private Button scanButton;
         private ProgressBar progressBar;
         private TextView progressText;
@@ -39,7 +40,13 @@ namespace CFScanner.Fragments
         private ArrayAdapter<string> goodIpAdapter;
         private string errorInternet, errorInputNull, scanLabel, cancelLabel, clipboardMessage;
 
+        List<Thread> threads;
+        List<string> cdnIps;
+        string hostname, path;
+        int port, thread, IPiterator = 0;
+
         private CancellationTokenSource cancellationTokenSource;
+        private AssetManager assetManager;
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -50,9 +57,9 @@ namespace CFScanner.Fragments
             var view = inflater.Inflate(Resource.Layout.page_scanner, container, false);
 
             hostnameInput = view.FindViewById<TextInputEditText>(Resource.Id.hostnameInput);
+            pathInput = view.FindViewById<TextInputEditText>(Resource.Id.pathInput);
             portInput = view.FindViewById<TextInputEditText>(Resource.Id.portInput);
             threadCountInput = view.FindViewById<TextInputEditText>(Resource.Id.threadCountInput);
-            sslInput = view.FindViewById<SwitchCompat>(Resource.Id.sslInput);
             scanButton = view.FindViewById<Button>(Resource.Id.checkButton);
             progressBar = view.FindViewById<ProgressBar>(Resource.Id.progressBar);
             progressText = view.FindViewById<TextView>(Resource.Id.textProgress);
@@ -73,6 +80,12 @@ namespace CFScanner.Fragments
 
             scanButton.Click += ScanButton_Click;
             goodIpListView.ItemClick += GoodIpListView_ItemClick;
+
+            assetManager = Activity.Assets;
+            cdnIps = assetManager.GetCDNIPList();
+            threads = new List<Thread>();
+            hostname = string.Empty;
+            path = "/";
 
             return view;
         }
@@ -120,129 +133,86 @@ namespace CFScanner.Fragments
             {
                 // Clear previous results
                 progressBar.Progress = 0;
+                progressBar.Max = cdnIps.Count;
                 progressText.Text = "0%";
                 scannedIps.Clear();
                 goodIpAdapter.Clear();
                 goodIpAdapter.NotifyDataSetChanged();
+                threads.Clear();
+                cancellationTokenSource = new CancellationTokenSource();
+                hostname = hostnameInput.Text;
+                path = pathInput.Text;
+                port = Convert.ToInt32(portInput.Text);
+                thread = Convert.ToInt32(threadCountInput.Text);
+                IPiterator = 0;
+                progressText.Text = "0%";
 
                 cancellationTokenSource = new CancellationTokenSource();
 
-                Task.Run(() =>
+                try
                 {
-                    string proto = sslInput.Checked ? "https" : "http";
-                    string hostname = hostnameInput.Text;
-                    int port = int.Parse(portInput.Text);
-                    int threadCount = int.Parse(threadCountInput.Text);
-
-                    try
+                    for (int j = 0; j < thread; j++)
                     {
-                        StartIpScan(proto, hostname, port, threadCount, cancellationTokenSource.Token);
-                    }
-                    catch (System.OperationCanceledException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                        // Handle cancellation
-                        Activity.RunOnUiThread(() =>
+                        threads.Add(new Thread(Scan)
                         {
-                            UpdateScanButtonText(scanLabel);
+                            IsBackground = true,
+                            Name = $"scanner #{j}"
                         });
+                        threads[j].Start();
                     }
-                    finally
+                }
+                catch (System.OperationCanceledException ex)
+                {
+                    // Handle cancellation
+                    Activity.RunOnUiThread(() =>
                     {
-                        Activity.RunOnUiThread(() =>
-                        {
-                            UpdateScanButtonText(scanLabel);
-                        });
-                    }
-                });
+                        UpdateScanButtonText(scanLabel);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Toast.MakeText(Activity, ex.Message, ToastLength.Long).Show();
+                }
+                finally
+                {
+                    Activity.RunOnUiThread(() =>
+                    {
+                        UpdateScanButtonText(scanLabel);
+                    });
+                }
 
                 UpdateScanButtonText(cancelLabel);
             }
         }
 
-        private void StartIpScan(string proto, string hostname, int port, int threadCount, CancellationToken cancellationToken)
+        private async void Scan()
         {
-            try
+            while (IPiterator < cdnIps.Count)
             {
-                AssetManager assetManager = Activity.Assets;
-                string filename = "cdn.txt";
-
-                using StreamReader sr = new StreamReader(assetManager.Open(filename));
-                string fileContents = sr.ReadToEnd();
-                string[] cdnIps = fileContents.Split("\r\n");
-                progressBar.Max = cdnIps.Length;
-                var p = Parallel.ForEach(cdnIps, new ParallelOptions { MaxDegreeOfParallelism = threadCount, CancellationToken = cancellationToken }, ip =>
+                if (cancellationTokenSource.IsCancellationRequested)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    CheckIp(proto, $"{ip}:{port}", hostname);
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-
-        private void CheckIp(string proto, string ip, string hostname)
-        {
-            string url = $"{proto}://{ip}/";
-
-            try
-            {
-                HttpWebRequest Request = (HttpWebRequest)WebRequest.Create(url);
-                Request.Method = "GET";
-                Request.KeepAlive = true;
-                Request.AllowAutoRedirect = false;
-                Request.Host = hostname;
-
-                HttpWebResponse response = (HttpWebResponse)Request.GetResponse();
-
-                HttpStatusCode statusCode = response.StatusCode;
-
-                if (statusCode == HttpStatusCode.BadRequest)
-                {
-                    AddToGoodIpList(ip);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is WebException)
-                {
-                    var wex = ex as WebException;
-                    if (wex.Response is HttpWebResponse response)
+                    UpdateScanButtonText(scanLabel);
+                    foreach (var item in threads)
                     {
-                        Stream responseStream = response.GetResponseStream();
-
-                        StreamReader streamReader = new StreamReader(responseStream, Encoding.Default);
-
-                        string responseContent = streamReader.ReadToEnd();
-                        HttpStatusCode statusCode = response.StatusCode;
-
-                        if (statusCode == HttpStatusCode.BadRequest)
-                        {
-                            AddToGoodIpList(ip);
-                        }
-                        else if (statusCode == HttpStatusCode.MovedPermanently || statusCode == HttpStatusCode.Found)
-                        {
-                            Console.WriteLine("Filtered: " + ip);
-                        }
-
-                        streamReader.Close();
-                        responseStream.Close();
-                        response.Close();
+                        item.Interrupt();
+                        item.Join(500);
                     }
-                    else
-                    {
-                        Console.WriteLine($"{ip} => {ex.Message}");
-                    }
+                    break;
                 }
-                else
-                    Toast.MakeText(Activity, ex.Message, ToastLength.Short);
+                var ip = cdnIps[IPiterator];
+                IPiterator++;
+                var result = await CFDScanner.Scan(hostname, port, ip, path, 3);
+                if (result.Status == ScanResult.ScanStatus.Success)
+                {
+                    AddToGoodIpList($"{ip}\t:\t{result.Delay}ms");
+                }
+                SetProgressBar(IPiterator);
             }
-            scannedIps.Add(ip);
-            SetProgressBar(scannedIps.Count);
+            if (IPiterator == cdnIps.Count)
+            {
+                UpdateScanButtonText(scanLabel);
+                cancellationTokenSource = new CancellationTokenSource();
+            }
         }
 
         private void AddToGoodIpList(string ip)

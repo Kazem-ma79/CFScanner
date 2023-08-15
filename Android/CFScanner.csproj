@@ -45,6 +45,7 @@
     <AndroidSigningStorePass>Cf3canner</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>CFScanner</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>Cf3canner</AndroidSigningKeyPass>
+    <AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -124,11 +125,11 @@
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.2" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.3" />
     <PackageReference Include="Xamarin.AndroidX.ConstraintLayout">
-      <Version>2.1.4.5</Version>
+      <Version>2.1.4.6</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.9.0.1" />
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.9.0.2" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.7" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +194,15 @@
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{1d4ee7aa-9d57-4e30-afc7-5dbdb9f1253d}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\triad_ring.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>

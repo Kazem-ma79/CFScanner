@@ -15,6 +15,7 @@
   <string name="navmenu_checker">چکر</string>
   <string name="navmenu_about">درباره</string>
   <string name="input_hostname">دامنه</string>
+  <string name="input_path">مسیر</string>
   <string name="input_port">پورت</string>
   <string name="input_thread">ترد</string>
   <string name="input_cf_ip">IP کلودفلر</string>
@@ -29,6 +30,7 @@
   <string name="error_incomplete_input">تمام فیلدها را پر کنید!</string>
   <string name="state_good">خوب</string>
   <string name="state_bad">فیلتر شده</string>
+  <string name="state_error">ارور</string>
   <string name="cancel">کنسل</string>
   <string name="clipboard_set">در حافظه کپی شد</string>
 </resources>

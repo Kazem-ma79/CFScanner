@@ -19,18 +19,21 @@ using Google.Android.Material.TextField;
 using AndroidX.Core.Content;
 using Google.Android.Material.MaterialSwitch;
 using AndroidX.AppCompat.Widget;
+using Core;
+using Google.Android.Material.Dialog;
+using System.Runtime.Remoting.Contexts;
 
 namespace CFScanner.Fragments
 {
     public class Checker : Fragment
     {
         private TextInputEditText hostnameInput;
+        private TextInputEditText pathInput;
         private TextInputEditText portInput;
         private TextInputEditText CFIPInput;
-        private SwitchCompat sslInput;
         private Button checkButton;
         private TextView resultTextView;
-        private string errorInternet, errorInputNull, stateGood, stateBad;
+        private string errorInternet, errorInputNull, stateGood, stateBad, stateError;
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -42,9 +45,9 @@ namespace CFScanner.Fragments
             var view = inflater.Inflate(Resource.Layout.page_checker, container, false);
 
             hostnameInput = view.FindViewById<TextInputEditText>(Resource.Id.hostnameInput);
+            pathInput = view.FindViewById<TextInputEditText>(Resource.Id.pathInput);
             portInput = view.FindViewById<TextInputEditText>(Resource.Id.portInput);
             CFIPInput = view.FindViewById<TextInputEditText>(Resource.Id.CFIPInput);
-            sslInput = view.FindViewById<SwitchCompat>(Resource.Id.sslInput);
             checkButton = view.FindViewById<Button>(Resource.Id.checkButton);
             resultTextView = view.FindViewById<TextView>(Resource.Id.textResult);
 
@@ -54,6 +57,7 @@ namespace CFScanner.Fragments
             errorInputNull = Activity.GetStringFromResources(Resource.String.error_incomplete_input);
             stateGood = Activity.GetStringFromResources(Resource.String.state_good);
             stateBad = Activity.GetStringFromResources(Resource.String.state_bad);
+            stateError = Activity.GetStringFromResources(Resource.String.state_error);
 
             return view;
         }
@@ -64,69 +68,31 @@ namespace CFScanner.Fragments
                 Toast.MakeText(Activity, errorInternet, ToastLength.Short).Show();
                 return;
             }
-            if (string.IsNullOrEmpty(hostnameInput.Text) || string.IsNullOrEmpty(portInput.Text) || string.IsNullOrEmpty(CFIPInput.Text))
+            if (string.IsNullOrEmpty(hostnameInput.Text) || string.IsNullOrEmpty(portInput.Text) || string.IsNullOrEmpty(CFIPInput.Text) || string.IsNullOrEmpty(pathInput.Text))
             {
                 Toast.MakeText(Activity, errorInputNull, ToastLength.Long).Show();
                 return;
             }
+            var madb = new AndroidX.AppCompat.App.AlertDialog.Builder(Activity)
+                .SetTitle("Checking")
+                .SetMessage("Checking domain status on IP ....")
+                .SetIcon(Resource.Drawable.triad_ring)
+                .SetCancelable(true)
+                .Show();
 
-            HttpStatusCode statusCode = 0;
-            try
-            {
-                string proto = sslInput.Checked ? "https" : "http";
-                string hostname = hostnameInput.Text;
-                string cfip = CFIPInput.Text;
-                int port = int.Parse(portInput.Text);
-                string url = $"{proto}://{cfip}:{port}/";
+            string hostname = hostnameInput.Text;
+            string path = pathInput.Text;
+            string cfip = CFIPInput.Text;
+            int port = int.Parse(portInput.Text);
 
-                HttpClientHandler httpClientHandler = new HttpClientHandler
-                {
-                    AllowAutoRedirect = false
-                };
+            var result = await CFDScanner.Scan(hostname, port, cfip, path);
+            SetResult(IsGood: result.Status == ScanResult.ScanStatus.Success,
+                Error: result.Status != ScanResult.ScanStatus.Success && result.Status != ScanResult.ScanStatus.Filtered);
 
-                using HttpClient client = new HttpClient(httpClientHandler)
-                {
-                    BaseAddress = new Uri(url)
-                };
-                client.DefaultRequestHeaders.Host = hostname;
-                var result = await client.GetAsync(url);
-                statusCode = result.StatusCode;
-                string resultContent = await result.Content.ReadAsStringAsync();
-            }
-            catch(Exception ex)
-            {
-                if (ex is WebException)
-                {
-                    var wex = ex as WebException;
-                    if (wex.Response is HttpWebResponse response)
-                    {
-                        Stream responseStream = response.GetResponseStream();
-
-                        StreamReader streamReader = new StreamReader(responseStream, Encoding.Default);
-
-                        string responseContent = streamReader.ReadToEnd();
-                        statusCode = response.StatusCode;
-
-                        streamReader.Close();
-                        responseStream.Close();
-                        response.Close();
-                    }
-                    else
-                    {
-                        Console.WriteLine("[-] " + ex.Message);
-                    }
-                }
-                else
-                    Toast.MakeText(Activity, ex.Message, ToastLength.Short);
-            }
-
-            if (statusCode == HttpStatusCode.Found || statusCode == HttpStatusCode.MovedPermanently)
-                SetResult(false);
-            else if (statusCode != 0)
-                SetResult(true);
+            madb.Cancel();
         }
 
-        private void SetResult(bool IsGood)
+        private void SetResult(bool IsGood, bool Error = false)
         {
             int successColorId = Resource.Color.colorSuccess;
             int dangerColorId = Resource.Color.colorDanger;
@@ -140,12 +106,22 @@ namespace CFScanner.Fragments
                     resultTextView.SetText(stateGood, TextView.BufferType.Normal);
                 });
             else
-                Activity.RunOnUiThread(() =>
-                {
-                    resultTextView.SetTextColor(dangerColor);
+            {
+                if (!Error)
+                    Activity.RunOnUiThread(() =>
+                    {
+                        resultTextView.SetTextColor(dangerColor);
 
-                    resultTextView.SetText(stateBad, TextView.BufferType.Normal);
-                });
+                        resultTextView.SetText(stateBad, TextView.BufferType.Normal);
+                    });
+                else
+                    Activity.RunOnUiThread(() =>
+                    {
+                        resultTextView.SetTextColor(dangerColor);
+
+                        resultTextView.SetText(stateError, TextView.BufferType.Normal);
+                    });
+            }
         }
     }
 }

@@ -15,6 +15,7 @@
   <string name="navmenu_checker">Domain Checker</string>
   <string name="navmenu_about">About</string>
   <string name="input_hostname">Hostname</string>
+  <string name="input_path">Path</string>
   <string name="input_port">Port</string>
   <string name="input_thread">Threads</string>
   <string name="input_cf_ip">Cloudflare IP</string>
@@ -29,6 +30,7 @@
   <string name="error_incomplete_input">Complete required fields!</string>
   <string name="state_good">Good</string>
   <string name="state_bad">Filtered</string>
+  <string name="state_error">Error</string>
   <string name="cancel">Cancel</string>
-  <string name="clipboard_set">copied in clipboard</string>
+  <string name="clipboard_set">Copied to clipboard</string>
 </resources>
