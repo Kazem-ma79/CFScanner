@@ -94,7 +94,7 @@ namespace Windows
         {
             if (Result.SelectedIndex >= 0)
             {
-                string item = ((ResultItem)Result.SelectedItem).Ping.ToString();
+                string item = ((ResultItem)Result.SelectedItem).IP.ToString();
                 Clipboard.SetText(item);
                 var mySettings = new MetroDialogSettings()
                 {
