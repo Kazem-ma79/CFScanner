@@ -1,6 +1,8 @@
 ﻿using Core;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +12,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,6 +34,9 @@ namespace Windows
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        private OpenFileDialog openFileDialog;
+        private SaveFileDialog saveFileDialog;
+
         private CancellationTokenSource cancellationTokenSource;
         private readonly ObservableCollection<int> CFPorts = new(new int[] { 80, 443, 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8080, 8880, 8443 });
         private ObservableCollection<ResultItem> Results;
@@ -58,6 +65,21 @@ namespace Windows
             ResultCollection.SortDescriptions.Add(new SortDescription("Ping", ListSortDirection.Ascending));
             Result.ItemsSource = ResultCollection.View;
             Result.SelectionChanged += Result_SelectionChanged;
+
+            openFileDialog = new OpenFileDialog()
+            {
+                DefaultExt = ".txt",
+                Filter = "Text Files|*.txt",
+                Title = "Select IP list"
+            };
+            saveFileDialog = new SaveFileDialog()
+            {
+                DefaultExt = ".txt",
+                Filter = "Text Files|*.txt",
+                Title = "Save Good IP list"
+            };
+            openFileDialog.FileOk += LoadFile;
+            saveFileDialog.FileOk += SaveFile;
 
             cdnIps = new(Properties.Resources.cdn.Split(Environment.NewLine));
         }
@@ -229,6 +251,55 @@ namespace Windows
                 FileName = "https://github.com/Kazem-ma79/CFScanner/",
                 UseShellExecute = true
             });
+        }
+
+        private void Import(object sender, RoutedEventArgs e)
+        {
+            openFileDialog.ShowDialog();
+        }
+
+        private async void LoadFile(object? sender, CancelEventArgs e)
+        {
+            if (e.Cancel) return;
+            var fileName = openFileDialog.FileName;
+            var fileContent = await File.ReadAllLinesAsync(fileName);
+            cdnIps = new(fileContent);
+
+            if (cdnIps.Count == fileContent.Length)
+            {
+                var mySettings = new MetroDialogSettings()
+                {
+                    AnimateShow = true,
+                    AnimateHide = true
+                };
+                await this.ShowMessageAsync("Loading Done!",
+                    $"Loaded {cdnIps.Count} IPs",
+                    MessageDialogStyle.Affirmative, mySettings);
+            }
+        }
+
+        private void Export(object sender, RoutedEventArgs e)
+        {
+            saveFileDialog.ShowDialog();
+        }
+
+        private async void SaveFile(object? sender, CancelEventArgs e)
+        {
+            if (e.Cancel) return;
+            var tempItems = ResultCollection.View;
+            var tempCount = Results.Count;
+            var fileName = saveFileDialog.FileName;
+            var jsonContent = JsonConvert.SerializeObject(tempItems, Formatting.Indented);
+            await File.WriteAllTextAsync(fileName, jsonContent, Encoding.UTF8);
+
+            var mySettings = new MetroDialogSettings()
+            {
+                AnimateShow = true,
+                AnimateHide = true
+            };
+            await this.ShowMessageAsync("Saving Done!",
+                $"Saved {tempCount} IPs",
+                MessageDialogStyle.Affirmative, mySettings);
         }
     }
 }
